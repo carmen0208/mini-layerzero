@@ -28,6 +28,7 @@ cd mini-layerzero
 
 # 安装依赖
 forge install
+pnpm install
 
 # 构建项目
 forge build

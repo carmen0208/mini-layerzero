@@ -28,6 +28,7 @@ cd mini-layerzero
 
 # Install dependencies
 forge install
+pnpm install
 
 # Build the project
 forge build
