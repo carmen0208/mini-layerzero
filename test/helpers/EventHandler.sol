@@ -14,14 +14,14 @@ contract EventHandler {
 
     event MessageScheduled(uint32 indexed dstEid, address indexed receiver, bytes32 indexed guid);
 
-    TestHelper public immutable testHelper;
+    TestHelper public immutable TEST_HELPER;
 
     /**
      * @dev Constructor for EventHandler
      * @param _testHelper The TestHelper contract address
      */
     constructor(address _testHelper) {
-        testHelper = TestHelper(_testHelper);
+        TEST_HELPER = TestHelper(_testHelper);
     }
 
     /**
@@ -48,7 +48,7 @@ contract EventHandler {
         console.log("--------------------------------");
 
         // Add message to message queue
-        testHelper.schedulePacket(_encodedPacket);
+        TEST_HELPER.schedulePacket(_encodedPacket);
 
         emit MessageScheduled(packet.dstEid, packet.receiver.bytes32ToAddress(), packet.guid);
     }

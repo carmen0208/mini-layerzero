@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import "./ILayerZeroEndpoint.sol";
+import {ILayerZeroEndpoint} from "./ILayerZeroEndpoint.sol";
 
 /**
  * @title ILayerZeroReceiver

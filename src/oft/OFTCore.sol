@@ -12,12 +12,12 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
     using MessageLib for bytes;
     using AddressCast for bytes32;
 
-    ILayerZeroEndpoint public immutable endpoint;
+    ILayerZeroEndpoint public immutable ENDPOINT;
 
     mapping(uint32 => bytes32) public peers;
 
-    uint256 public immutable decimalConverterRate;
-    uint8 public immutable sharedDecimals;
+    uint256 public immutable DECIMAL_CONVERTER_RATE;
+    uint8 public immutable SHARED_DECIMALS;
 
     error InvalidEndpoint();
     error InvalidPeer(uint32 eid);
@@ -30,10 +30,10 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
     constructor(address _endpoint, uint8 _localDecimals) {
         if (_endpoint == address(0)) revert InvalidEndpoint();
 
-        endpoint = ILayerZeroEndpoint(_endpoint);
-        sharedDecimals = _sharedDecimals();
-        // Calculate decimal conversion rate (18 - sharedDecimals)
-        decimalConverterRate = 10 ** (_localDecimals - _sharedDecimals());
+        ENDPOINT = ILayerZeroEndpoint(_endpoint);
+        SHARED_DECIMALS = _sharedDecimals();
+        // Calculate decimal conversion rate (18 - SHARED_DECIMALS)
+        DECIMAL_CONVERTER_RATE = 10 ** (_localDecimals - _sharedDecimals());
     }
 
     /**
@@ -71,7 +71,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
      */
     function _buildMessage(SendParam calldata _sendParam) internal view returns (bytes memory) {
         return MessageLib.encodeSend(
-            _sendParam.to, DecimalConverter.toSharedDecimal(_sendParam.amountLD, decimalConverterRate)
+            _sendParam.to, DecimalConverter.toSharedDecimal(_sendParam.amountLD, DECIMAL_CONVERTER_RATE)
         );
     }
 
@@ -84,7 +84,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
     function _lzReceive(ILayerZeroEndpoint.Origin calldata _origin, bytes32 _guid, bytes calldata _message) internal {
         address toAddress = _message.sendTo().bytes32ToAddress();
         uint64 amountShared = _message.amountShared();
-        uint256 amountLD = DecimalConverter.toLocalDecimal(amountShared, decimalConverterRate);
+        uint256 amountLD = DecimalConverter.toLocalDecimal(amountShared, DECIMAL_CONVERTER_RATE);
 
         uint256 amountReceivedLD = _credit(toAddress, amountLD);
 
@@ -119,7 +119,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
             message: message
         });
 
-        endpoint.send(params);
+        ENDPOINT.send(params);
         receipt = OFTReceipt({amountSentLD: amountSentLD, amountReceivedLD: amountReceivedLD});
     }
 

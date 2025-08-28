@@ -6,7 +6,7 @@ import {PacketCodec} from "./PacketCodec.sol";
 import {ILayerZeroReceiver} from "../interfaces/ILayerZeroReceiver.sol";
 
 contract Endpoint is ILayerZeroEndpoint {
-    uint32 public immutable eid;
+    uint32 public immutable EID;
     mapping(uint32 => mapping(address => uint64)) public nonces;
     mapping(bytes32 => bool) public verifiedPayloads;
     mapping(bytes32 => bool) public deliveredMessages;
@@ -19,7 +19,7 @@ contract Endpoint is ILayerZeroEndpoint {
      * @param _eid The chain ID for this endpoint
      */
     constructor(uint32 _eid) {
-        eid = _eid;
+        EID = _eid;
     }
 
     /**
@@ -28,18 +28,18 @@ contract Endpoint is ILayerZeroEndpoint {
      * @return receipt The receipt containing the generated GUID and nonce
      */
     function send(MessagingParams calldata _params) external returns (MessagingReceipt memory receipt) {
-        // Initial state: nonces[eid][msg.sender] doesn't exist
-        uint64 nonce = ++nonces[eid][msg.sender];
+        // Initial state: nonces[EID][msg.sender] doesn't exist
+        uint64 nonce = ++nonces[EID][msg.sender];
         // Execution process:
-        // 1. nonces[eid][msg.sender] returns 0 (default value)
+        // 1. nonces[EID][msg.sender] returns 0 (default value)
         // 2. ++0 = 1
         // 3. nonce = 1
-        // 4. nonces[eid][msg.sender] = 1
+        // 4. nonces[EID][msg.sender] = 1
 
         // Create packet
         PacketCodec.Packet memory packet = PacketCodec.Packet({
             nonce: nonce,
-            srcEid: eid,
+            srcEid: EID,
             sender: msg.sender,
             dstEid: _params.dstEid,
             receiver: _params.receiver,
