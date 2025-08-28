@@ -1,5 +1,7 @@
 # Mini-LayerZero
 
+[English](README.md) | [中文](README_CN.md)
+
 A simplified, educational implementation of LayerZero's core concepts for cross-chain token transfers. This project extracts the essential logic from LayerZero's complex architecture to help developers understand the fundamental principles of cross-chain communication.
 
 ## 🎯 Why Mini-LayerZero?
@@ -74,6 +76,7 @@ mini-layerzero/
 - **Error Recovery**: Limited error handling and recovery mechanisms
 - **Multi-Chain Support**: Only demonstrates 2-chain scenario
 - **Advanced Routing**: No complex message routing or fallback mechanisms
+- **OFT Adapter Solutions**: No OFT adapter implementations for different token standards
 
 ### Why These Are Omitted
 These features add significant complexity and are better understood after mastering the core concepts. This project focuses on the **fundamental flow** rather than production-ready features.
@@ -275,17 +278,15 @@ function send(SendParam calldata _sendParam) external returns (OFTReceipt memory
 - Simplified security model
 - Limited to two chains
 
-### Suggested Improvements
-1. **Add Error Scenarios**: Test invalid transfers, insufficient balances
-2. **Multi-Chain Support**: Extend to 3+ chains
-3. **Security Features**: Add basic validation and replay protection
-4. **Gas Optimization**: Implement efficient message encoding
-5. **Integration Tests**: Test with actual testnets
+### Planed Improvements
+1. **Security Infrastructure**: Add DVN (Data Validation Network) and Executor configuration
+2. **Fee Quote**: Implement cross-chain fee calculation and quoting system
+3. **Integration Tests**: Test with actual testnets
 
 ## 📚 Further Reading
 
 - [LayerZero Documentation](https://layerzero.network/)
-- [OFT Standard](https://docs.layerzero.network/oft)
+- [OFT Standard](https://docs.layerzero.network/v2/developers/evm/oft/quickstart)
 - [Foundry Book](https://book.getfoundry.sh/)
 - [Solidity Documentation](https://docs.soliditylang.org/)
 
