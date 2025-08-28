@@ -17,14 +17,14 @@ contract OFT is OFTCore, ERC20 {
     }
 
     function _debit(address _from, uint256 _amountLD) internal override returns (uint256 amountSentLD, uint256 amountReceivedLD) {
-        // 简化版本：无手续费，1:1 转换
+        // Simplified version: no fees, 1:1 conversion
         amountSentLD = _amountLD;
         amountReceivedLD = _amountLD;
         _burn(_from, _amountLD);
     }
 
     function _credit(address _to, uint256 _amountLD) internal override returns (uint256 amountReceivedLD) {
-        // 简化版本：直接铸造
+        // Simplified version: direct minting
         amountReceivedLD = _amountLD;
         _mint(_to, amountReceivedLD);
     }

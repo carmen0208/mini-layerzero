@@ -3,23 +3,31 @@ pragma solidity ^0.8.22;
 
 import {ILayerZeroEndpoint} from "../interfaces/ILayerZeroEndpoint.sol";
 import {PacketCodec} from "./PacketCodec.sol";
+import {ILayerZeroReceiver} from "../interfaces/ILayerZeroReceiver.sol";
+
 contract Endpoint is ILayerZeroEndpoint {
     uint32 public immutable eid;
     mapping(uint32 => mapping(address => uint64)) public nonces;
+    mapping(bytes32 => bool) public verifiedPayloads;
+    mapping(bytes32 => bool) public deliveredMessages;
+
+    event PacketVerified(Origin indexed _origin, address indexed _receiver, bytes32 indexed _guid);
+    event PacketDelivered(Origin origin, address receiver);
+
     constructor(uint32 _eid) {
         eid = _eid;
     }
 
     function send(MessagingParams calldata _params) external returns (MessagingReceipt memory receipt) {
-        // 初始状态：nonces[eid][msg.sender] 不存在
+        // Initial state: nonces[eid][msg.sender] doesn't exist
         uint64 nonce = ++nonces[eid][msg.sender];
-        // 执行过程：
-        // 1. nonces[eid][msg.sender] 返回 0（默认值）
+        // Execution process:
+        // 1. nonces[eid][msg.sender] returns 0 (default value)
         // 2. ++0 = 1
         // 3. nonce = 1
         // 4. nonces[eid][msg.sender] = 1
         
-        // 创建数据包
+        // Create packet
         PacketCodec.Packet memory packet = PacketCodec.Packet({
             nonce: nonce,
             srcEid: eid,
@@ -30,10 +38,10 @@ contract Endpoint is ILayerZeroEndpoint {
             message: _params.message
         });
 
-        // 生成 GUID
+        // Generate GUID
         packet.guid = PacketCodec.generateGuid(packet);
 
-        // 编码数据包
+        // Encode packet
         bytes memory encodedPacket = PacketCodec.encode(packet);
 
         emit PacketSent(encodedPacket, address(this));
@@ -44,5 +52,23 @@ contract Endpoint is ILayerZeroEndpoint {
         });
 
         return receipt;
+    }
+
+    function lzReceive(Origin calldata _origin, address _receiver, bytes32 _guid, bytes calldata _message) external {
+        // Check if message is verified (simplified version: directly mark as verified)
+        if (!verifiedPayloads[_guid]) {
+            verifiedPayloads[_guid] = true;
+            emit PacketVerified(_origin, _receiver, keccak256(_message));
+        }
+        
+        // Check if message is delivered
+        require(!deliveredMessages[_guid], "Endpoint: message already delivered");
+        deliveredMessages[_guid] = true;
+
+        try ILayerZeroReceiver(_receiver).lzReceive(_origin, _guid, _message) {
+            emit PacketDelivered(_origin, _receiver);
+        } catch Error(string memory reason) {
+            revert(string(abi.encodePacked("Endpoint: lzReceive failed - ", reason)));
+        }
     }
 }

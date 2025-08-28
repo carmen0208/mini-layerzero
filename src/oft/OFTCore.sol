@@ -3,10 +3,15 @@ pragma solidity ^0.8.22;
 
 import {IOFT} from "../interfaces/IOFT.sol";
 import {ILayerZeroEndpoint} from "../interfaces/ILayerZeroEndpoint.sol";
+import {ILayerZeroReceiver} from "../interfaces/ILayerZeroReceiver.sol";
 import {MessageLib} from "../core/MessageLib.sol";
 import {DecimalConverter} from "../core/DecimalConverter.sol";
+import {AddressCast} from "../core/AddressCast.sol";
 
-abstract contract OFTCore is IOFT {
+abstract contract OFTCore is IOFT, ILayerZeroReceiver {
+    using MessageLib for bytes;
+    using AddressCast for bytes32;
+
     ILayerZeroEndpoint public immutable endpoint;
 
     mapping(uint32 => bytes32) public peers;
@@ -22,7 +27,7 @@ abstract contract OFTCore is IOFT {
 
         endpoint = ILayerZeroEndpoint(_endpoint);
         sharedDecimals = _sharedDecimals();
-        // 计算精度转换率 (18 - sharedDecimals)
+        // Calculate decimal conversion rate (18 - sharedDecimals)
         decimalConverterRate = 10 ** (_localDecimals - _sharedDecimals());
     }
 
@@ -43,6 +48,16 @@ abstract contract OFTCore is IOFT {
 
     function _buildMessage(SendParam calldata _sendParam) internal view returns (bytes memory) {
         return MessageLib.encodeSend(_sendParam.to, DecimalConverter.toSharedDecimal(_sendParam.amountLD, decimalConverterRate));
+    }
+
+    function _lzReceive(ILayerZeroEndpoint.Origin calldata _origin, bytes32 _guid, bytes calldata _message) internal {
+        address toAddress = _message.sendTo().bytes32ToAddress();
+        uint64 amountShared = _message.amountShared();
+        uint256 amountLD = DecimalConverter.toLocalDecimal(amountShared, decimalConverterRate);
+
+        uint256 amountReceivedLD = _credit(toAddress, amountLD);
+
+        emit OFTReceived(_guid, _origin.srcEid, toAddress, amountReceivedLD);
     }
 
     function setPeer(uint32 _eid, bytes32 peer) external {
@@ -68,5 +83,13 @@ abstract contract OFTCore is IOFT {
             amountSentLD: amountSentLD,
             amountReceivedLD: amountReceivedLD
         });
+    }
+
+    function lzReceive(
+        ILayerZeroEndpoint.Origin calldata _origin,
+        bytes32 _guid,
+        bytes calldata _message
+    ) external {
+        _lzReceive(_origin, _guid, _message);
     }
 }
