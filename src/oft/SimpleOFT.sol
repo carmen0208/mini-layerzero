@@ -4,12 +4,9 @@ pragma solidity ^0.8.22;
 import {OFT} from "./OFT.sol";
 
 contract SimpleOFT is OFT {
-    constructor(
-        string memory name, 
-        string memory symbol,
-        address _endpoint,
-        uint256 _initialSupply
-    ) OFT(name, symbol, _endpoint, _initialSupply) {}
+    constructor(string memory name, string memory symbol, address _endpoint, uint256 _initialSupply)
+        OFT(name, symbol, _endpoint, _initialSupply)
+    {}
 
     /**
      * @dev local test only

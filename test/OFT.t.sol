@@ -16,9 +16,9 @@ contract OFTTest is Test {
     using AddressCast for bytes32;
     using PacketCodec for bytes;
     // Test chain configuration
+
     uint32 public constant CHAIN_A = 1;
     uint32 public constant CHAIN_B = 2;
-
 
     Endpoint public endpointA;
     SimpleOFT public oftA;
@@ -29,7 +29,7 @@ contract OFTTest is Test {
 
     address public userA;
     address public userB;
-    
+
     uint256 public constant INITIAL_SUPPLY = 1000000 * 10 ** 18; // 1 million tokens
     uint256 public constant USER_INITIAL_BALANCE = 100000 * 10 ** 18; // 100k tokens
 
@@ -53,7 +53,6 @@ contract OFTTest is Test {
 
         oftA = new SimpleOFT("OFTA", "OFTA", address(endpointA), INITIAL_SUPPLY);
         oftB = new SimpleOFT("OFTB", "OFTB", address(endpointB), INITIAL_SUPPLY);
-
 
         oftA.setPeer(CHAIN_B, address(oftB).addressToBytes32());
         oftB.setPeer(CHAIN_A, address(oftA).addressToBytes32());
@@ -85,12 +84,7 @@ contract OFTTest is Test {
 
         console.log("userB:", userB);
         IOFT.OFTReceipt memory oftReceipt = oftA.send(params);
-        assertEq(
-            oftReceipt.amountSentLD,
-            transferAmount,
-            "Amount sent should match"
-        );
-
+        assertEq(oftReceipt.amountSentLD, transferAmount, "Amount sent should match");
 
         // This test simulates off-chain work, processing PacketSent events and calling deliverMessage method.
         // Process PacketSent events, automatically dispatch messages
@@ -98,24 +92,15 @@ contract OFTTest is Test {
         // Process message queue
         testHelper.deliverMessages(CHAIN_B, address(oftB));
 
-
         uint256 userABalanceAfter = oftA.balanceOf(userA);
         uint256 userBBalanceAfterB = oftB.balanceOf(userB);
- 
+
         console.log("userABalanceBefore:", userABalanceBefore);
         console.log("transferAmount:", transferAmount);
         console.log("userABalanceAfter :", userABalanceAfter);
-        assertEq(
-            userABalanceAfter, 
-            userABalanceBefore - transferAmount, 
-            "UserA balance should decrease"
-        );
+        assertEq(userABalanceAfter, userABalanceBefore - transferAmount, "UserA balance should decrease");
 
-        assertEq(
-            userBBalanceAfterB,
-            userBBalanceBeforeB + transferAmount,
-            "UserB balance should increase on chain B"
-        );
+        assertEq(userBBalanceAfterB, userBBalanceBeforeB + transferAmount, "UserB balance should increase on chain B");
     }
 
     /**
@@ -126,13 +111,9 @@ contract OFTTest is Test {
         Vm.Log[] memory logs = vm.getRecordedLogs();
         for (uint256 i = 0; i < logs.length; i++) {
             Vm.Log memory log = logs[i];
-            if (log.topics[0] == keccak256("PacketSent(bytes,address)") &&
-                log.emitter == address(_endpoint)) {
+            if (log.topics[0] == keccak256("PacketSent(bytes,address)") && log.emitter == address(_endpoint)) {
                 // Parse event data
-                (
-                    bytes memory encodedPacket,
-                    address sendLibrary
-                ) = abi.decode(logs[i].data, (bytes,address));
+                (bytes memory encodedPacket, address sendLibrary) = abi.decode(logs[i].data, (bytes, address));
 
                 eventHandler.handlePacketSent(encodedPacket);
             }

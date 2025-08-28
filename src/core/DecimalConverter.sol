@@ -27,5 +27,3 @@ library DecimalConverter {
         return uint256(_amountSD) * decimalConversionRate;
     }
 }
-
-

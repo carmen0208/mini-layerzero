@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-
 library MessageLib {
     error InvalidMessage();
 
@@ -33,4 +32,5 @@ library MessageLib {
     function amountShared(bytes calldata _message) internal pure returns (uint64) {
         if (_message.length < 40) revert InvalidMessage(); // 32 + 8
         return uint64(bytes8(_message[32:40]));
-    }}
+    }
+}

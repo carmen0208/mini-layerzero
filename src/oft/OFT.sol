@@ -12,12 +12,10 @@ contract OFT is OFTCore, ERC20 {
      * @param _endpoint The LayerZero endpoint address
      * @param _initialSupply The initial token supply
      */
-    constructor(
-        string memory name, 
-        string memory symbol,
-        address _endpoint,
-        uint256 _initialSupply
-    ) ERC20(name, symbol) OFTCore(_endpoint, decimals()) {
+    constructor(string memory name, string memory symbol, address _endpoint, uint256 _initialSupply)
+        ERC20(name, symbol)
+        OFTCore(_endpoint, decimals())
+    {
         if (_initialSupply > 0) {
             _mint(msg.sender, _initialSupply);
         }
@@ -30,7 +28,11 @@ contract OFT is OFTCore, ERC20 {
      * @return amountSentLD The amount actually sent (1:1 conversion)
      * @return amountReceivedLD The amount that will be received on destination chain
      */
-    function _debit(address _from, uint256 _amountLD) internal override returns (uint256 amountSentLD, uint256 amountReceivedLD) {
+    function _debit(address _from, uint256 _amountLD)
+        internal
+        override
+        returns (uint256 amountSentLD, uint256 amountReceivedLD)
+    {
         // Simplified version: no fees, 1:1 conversion
         amountSentLD = _amountLD;
         amountReceivedLD = _amountLD;

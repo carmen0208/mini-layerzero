@@ -3,9 +3,9 @@ pragma solidity ^0.8.22;
 
 interface ILayerZeroEndpoint {
     struct Origin {
-        uint32 srcEid;      // Source chain ID
-        bytes32 sender;     // Sender address
-        uint64 nonce;       // Message sequence number
+        uint32 srcEid; // Source chain ID
+        bytes32 sender; // Sender address
+        uint64 nonce; // Message sequence number
     }
 
     struct MessagingParams {
@@ -15,8 +15,8 @@ interface ILayerZeroEndpoint {
     }
 
     struct MessagingReceipt {
-       bytes32 guid;       // Global unique identifier
-       uint64 nonce;       // Message sequence number
+        bytes32 guid; // Global unique identifier
+        uint64 nonce; // Message sequence number
     }
 
     event PacketSent(bytes encodedPayload, address sendLibrary);

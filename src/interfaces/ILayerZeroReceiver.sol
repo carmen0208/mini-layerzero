@@ -14,10 +14,5 @@ interface ILayerZeroReceiver {
      * @param _guid Global unique identifier of the message
      * @param _message Message content
      */
-    function lzReceive(
-        ILayerZeroEndpoint.Origin calldata _origin,
-        bytes32 _guid,
-        bytes calldata _message
-    ) external;
-
+    function lzReceive(ILayerZeroEndpoint.Origin calldata _origin, bytes32 _guid, bytes calldata _message) external;
 }

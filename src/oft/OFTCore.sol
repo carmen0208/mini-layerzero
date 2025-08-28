@@ -43,10 +43,10 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
      * @return amountSentLD The amount actually sent
      * @return amountReceivedLD The amount that will be received on destination chain
      */
-    function _debit(
-        address _from,
-        uint256 _amountLD
-    ) internal virtual returns (uint256 amountSentLD, uint256 amountReceivedLD);
+    function _debit(address _from, uint256 _amountLD)
+        internal
+        virtual
+        returns (uint256 amountSentLD, uint256 amountReceivedLD);
 
     /**
      * @dev Virtual function to handle token crediting (minting) when receiving tokens
@@ -54,10 +54,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
      * @param _amountLD The amount to credit in local decimals
      * @return amountReceivedLD The amount actually received
      */
-    function _credit(
-        address _to,
-        uint256 _amountLD
-    ) internal virtual returns (uint256 amountReceivedLD);
+    function _credit(address _to, uint256 _amountLD) internal virtual returns (uint256 amountReceivedLD);
 
     /**
      * @dev Returns the shared decimals used across all chains
@@ -67,14 +64,15 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
         return 6;
     }
 
-
     /**
      * @dev Builds the cross-chain message for sending tokens
      * @param _sendParam The send parameters containing destination and amount
      * @return The encoded message for cross-chain transmission
      */
     function _buildMessage(SendParam calldata _sendParam) internal view returns (bytes memory) {
-        return MessageLib.encodeSend(_sendParam.to, DecimalConverter.toSharedDecimal(_sendParam.amountLD, decimalConverterRate));
+        return MessageLib.encodeSend(
+            _sendParam.to, DecimalConverter.toSharedDecimal(_sendParam.amountLD, decimalConverterRate)
+        );
     }
 
     /**
@@ -122,10 +120,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
         });
 
         endpoint.send(params);
-        receipt = OFTReceipt({
-            amountSentLD: amountSentLD,
-            amountReceivedLD: amountReceivedLD
-        });
+        receipt = OFTReceipt({amountSentLD: amountSentLD, amountReceivedLD: amountReceivedLD});
     }
 
     /**
@@ -134,11 +129,7 @@ abstract contract OFTCore is IOFT, ILayerZeroReceiver {
      * @param _guid The global unique identifier of the message
      * @param _message The encoded message containing recipient and amount
      */
-    function lzReceive(
-        ILayerZeroEndpoint.Origin calldata _origin,
-        bytes32 _guid,
-        bytes calldata _message
-    ) external {
+    function lzReceive(ILayerZeroEndpoint.Origin calldata _origin, bytes32 _guid, bytes calldata _message) external {
         _lzReceive(_origin, _guid, _message);
     }
 }

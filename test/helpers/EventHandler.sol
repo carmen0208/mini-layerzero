@@ -12,9 +12,7 @@ contract EventHandler {
 
     mapping(bytes32 => bool) public processedEvents;
 
-
     event MessageScheduled(uint32 indexed dstEid, address indexed receiver, bytes32 indexed guid);
-
 
     TestHelper public immutable testHelper;
 

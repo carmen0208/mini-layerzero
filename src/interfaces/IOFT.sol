@@ -10,14 +10,9 @@ interface IOFT {
     }
 
     struct OFTReceipt {
-        uint256 amountSentLD;      // Actual amount sent
+        uint256 amountSentLD; // Actual amount sent
         uint256 amountReceivedLD; // Actual amount received
     }
 
-    event OFTReceived(
-        bytes32 indexed guid,
-        uint32 srcEid,
-        address indexed toAddress,
-        uint256 amountReceivedLD
-    );
+    event OFTReceived(bytes32 indexed guid, uint32 srcEid, address indexed toAddress, uint256 amountReceivedLD);
 }

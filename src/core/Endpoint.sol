@@ -35,7 +35,7 @@ contract Endpoint is ILayerZeroEndpoint {
         // 2. ++0 = 1
         // 3. nonce = 1
         // 4. nonces[eid][msg.sender] = 1
-        
+
         // Create packet
         PacketCodec.Packet memory packet = PacketCodec.Packet({
             nonce: nonce,
@@ -55,10 +55,7 @@ contract Endpoint is ILayerZeroEndpoint {
 
         emit PacketSent(encodedPacket, address(this));
 
-        receipt = MessagingReceipt({
-            guid: packet.guid,
-            nonce: packet.nonce
-        });
+        receipt = MessagingReceipt({guid: packet.guid, nonce: packet.nonce});
 
         return receipt;
     }
@@ -76,7 +73,7 @@ contract Endpoint is ILayerZeroEndpoint {
             verifiedPayloads[_guid] = true;
             emit PacketVerified(_origin, _receiver, keccak256(_message));
         }
-        
+
         // Check if message is delivered
         require(!deliveredMessages[_guid], "Endpoint: message already delivered");
         deliveredMessages[_guid] = true;
