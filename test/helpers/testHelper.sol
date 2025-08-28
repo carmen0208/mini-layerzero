@@ -16,10 +16,19 @@ contract TestHelper {
     mapping(uint32 => mapping(address => PacketCodec.Packet[])) public messageQueue;
     mapping(bytes32 => bool) public processedMessages;
 
+    /**
+     * @dev Sets the endpoint for a specific chain ID
+     * @param _eid The chain ID
+     * @param _endpoint The endpoint contract address
+     */
     function setEndpoint(uint32 _eid, address _endpoint) external {
         endpoints[_eid] = Endpoint(_endpoint);
     }
 
+    /**
+     * @dev Schedules a packet for delivery by adding it to the message queue
+     * @param _packet The encoded packet to schedule
+     */
     function schedulePacket(bytes memory _packet) external {
         PacketCodec.Packet memory packet = _packet.decode();
         address receiver = packet.receiver.bytes32ToAddress();
@@ -28,6 +37,11 @@ contract TestHelper {
         messageQueue[packet.dstEid][receiver].push(packet);
     }
 
+    /**
+     * @dev Delivers all scheduled messages for a specific receiver on a destination chain
+     * @param _dstEid The destination chain ID
+     * @param _receiver The receiver contract address
+     */
     function deliverMessages(uint32 _dstEid, address _receiver) external {
         PacketCodec.Packet[] storage packets = messageQueue[_dstEid][_receiver];
         Endpoint dstEndpoint = endpoints[_dstEid];

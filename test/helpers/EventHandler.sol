@@ -18,10 +18,18 @@ contract EventHandler {
 
     TestHelper public immutable testHelper;
 
+    /**
+     * @dev Constructor for EventHandler
+     * @param _testHelper The TestHelper contract address
+     */
     constructor(address _testHelper) {
         testHelper = TestHelper(_testHelper);
     }
 
+    /**
+     * @dev Handles PacketSent events by decoding and scheduling them for delivery
+     * @param _encodedPacket The encoded packet data from the event
+     */
     function handlePacketSent(bytes memory _encodedPacket) external {
         PacketCodec.Packet memory packet = _encodedPacket.decode();
 

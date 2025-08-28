@@ -33,6 +33,9 @@ contract OFTTest is Test {
     uint256 public constant INITIAL_SUPPLY = 1000000 * 10 ** 18; // 1 million tokens
     uint256 public constant USER_INITIAL_BALANCE = 100000 * 10 ** 18; // 100k tokens
 
+    /**
+     * @dev Sets up the test environment with two chains, endpoints, and OFT contracts
+     */
     function setUp() public {
         testHelper = new TestHelper();
         eventHandler = new EventHandler(address(testHelper));
@@ -58,6 +61,10 @@ contract OFTTest is Test {
         oftA.mint(userA, USER_INITIAL_BALANCE);
     }
 
+    /**
+     * @dev Tests the complete cross-chain token transfer flow
+     * Simulates sending tokens from Chain A to Chain B and processing the delivery
+     */
     function test_SendAndDeliver() public {
         uint256 transferAmount = 5000 * 10 ** 18;
         uint256 minAmountLD = transferAmount * 99 / 100;
@@ -111,6 +118,10 @@ contract OFTTest is Test {
         );
     }
 
+    /**
+     * @dev Processes PacketSent events and forwards them to the event handler
+     * @param _endpoint The endpoint address to filter events from
+     */
     function _processPacketSentEvents(address _endpoint) internal {
         Vm.Log[] memory logs = vm.getRecordedLogs();
         for (uint256 i = 0; i < logs.length; i++) {

@@ -14,10 +14,19 @@ contract Endpoint is ILayerZeroEndpoint {
     event PacketVerified(Origin indexed _origin, address indexed _receiver, bytes32 indexed _guid);
     event PacketDelivered(Origin origin, address receiver);
 
+    /**
+     * @dev Constructor for Endpoint
+     * @param _eid The chain ID for this endpoint
+     */
     constructor(uint32 _eid) {
         eid = _eid;
     }
 
+    /**
+     * @dev Sends a message to another chain via LayerZero
+     * @param _params The messaging parameters containing destination chain, receiver, and message
+     * @return receipt The receipt containing the generated GUID and nonce
+     */
     function send(MessagingParams calldata _params) external returns (MessagingReceipt memory receipt) {
         // Initial state: nonces[eid][msg.sender] doesn't exist
         uint64 nonce = ++nonces[eid][msg.sender];
@@ -54,6 +63,13 @@ contract Endpoint is ILayerZeroEndpoint {
         return receipt;
     }
 
+    /**
+     * @dev Receives and processes incoming LayerZero messages
+     * @param _origin The origin information of the message
+     * @param _receiver The address of the receiver contract
+     * @param _guid The global unique identifier of the message
+     * @param _message The message content
+     */
     function lzReceive(Origin calldata _origin, address _receiver, bytes32 _guid, bytes calldata _message) external {
         // Check if message is verified (simplified version: directly mark as verified)
         if (!verifiedPayloads[_guid]) {
